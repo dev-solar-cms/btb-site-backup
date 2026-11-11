@@ -1,0 +1,7 @@
+# Fichiers propres au dépôt, exclus de l'archive de la release (git archive)
+.gitignore      export-ignore
+.gitattributes  export-ignore
+/bin            export-ignore
+
+# Fins de ligne normalisées
+* text=auto eol=lf

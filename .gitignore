@@ -1,0 +1,9 @@
+# Archives générées
+/dist/
+*.zip
+
+# Éditeurs et système
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

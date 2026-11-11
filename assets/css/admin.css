@@ -1,0 +1,131 @@
+/* BTB Sauvegarde — page d'administration */
+
+.btb-backup .btb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.btb-backup .btb-grid .card {
+    max-width: none;
+    margin: 0;
+}
+
+/* Badges et niveaux de gravité */
+.btb-backup .btb-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    margin: 2px 4px 0 0;
+    border-radius: 10px;
+    background: #f0f0f1;
+    font-size: 12px;
+}
+
+.btb-backup .btb-lock {
+    background: #fcf0c3;
+}
+
+.btb-backup .btb-level {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Tableau des sauvegardes */
+.btb-backup .btb-table td {
+    vertical-align: top;
+}
+
+.btb-backup .btb-comp {
+    margin: 2px 0;
+}
+
+.btb-backup .btb-table details > summary {
+    cursor: pointer;
+}
+
+.btb-backup .btb-warn-toggle {
+    margin-top: 6px;
+}
+
+.btb-backup .btb-restore {
+    min-width: 280px;
+    margin-top: 6px;
+    padding: 8px 12px;
+    border: 1px solid #c3c4c7;
+    background: #fff;
+}
+
+.btb-backup .btb-inline {
+    margin: 6px 0;
+}
+
+/* Avertissements */
+.btb-backup .btb-wgroup {
+    margin: 8px 0;
+    padding: 4px 12px;
+    border-left: 4px solid #ccc;
+    background: #fff;
+}
+
+.btb-backup .btb-paths {
+    max-height: 240px;
+    overflow: auto;
+    margin: 4px 0 8px 18px;
+    list-style: disc;
+}
+
+/* Journal */
+.btb-backup .btb-log {
+    margin-top: 8px;
+}
+
+/* Barre de progression */
+.btb-backup .btb-pwrap {
+    margin: 8px 0;
+    padding: 8px 12px;
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+    background: #f6f7f7;
+}
+
+.btb-backup .btb-pbar {
+    position: relative;
+    height: 26px;
+    margin: 6px 0;
+    overflow: hidden;
+    border: 1px solid #c3c4c7;
+    border-radius: 13px;
+    background: #f0f0f1;
+}
+
+.btb-backup .btb-pbar > span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #2271b1, #4f94d4);
+    transition: width 0.6s ease;
+}
+
+.btb-backup .btb-pbar > em {
+    position: absolute;
+    inset: 0;
+    color: #1d2327;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+    text-align: center;
+}
+
+.btb-backup .btb-step {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+
+.btb-backup .btb-detail {
+    margin: 2px 0 0;
+}
