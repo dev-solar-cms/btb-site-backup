@@ -2,7 +2,7 @@
 /**
  * Plugin Name: BTB Sauvegarde
  * Description: Sauvegardes automatiques et incrémentales (base de données, extensions, thèmes, médias, autres fichiers), stockées uniquement sur le serveur, hors du dossier web, avec restauration automatique. Aucune tâche cron, aucun service distant.
- * Version: 1.0.5
+ * Version: 1.0.6
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: David ROMERA

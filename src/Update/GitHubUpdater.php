@@ -19,14 +19,19 @@ final class GitHubUpdater
     const REPO      = 'dev-solar-cms/btb-site-backup';
     const SLUG      = 'btb-site-backup';
     const CACHE_KEY = 'btb_backup_github_release';
-    const CACHE_OK  = 6 * HOUR_IN_SECONDS;   // résultat valide
-    const CACHE_KO  = HOUR_IN_SECONDS;       // échec : on réessaie plus tard (limite de l'API GitHub)
+    const NOTES_KEY = 'btb_backup_github_notes';
+    const CACHE_OK  = 6 * HOUR_IN_SECONDS;    // résultat valide
+    const CACHE_KO  = HOUR_IN_SECONDS;        // échec : on réessaie plus tard
+    const NOTES_TTL = 12 * HOUR_IN_SECONDS;   // notes de version (API GitHub, quota limité)
 
     public function register(): void
     {
         add_filter('update_plugins_github.com', [$this, 'checkUpdate'], 10, 3);
         add_filter('plugins_api', [$this, 'details'], 20, 3);
         add_filter('upgrader_source_selection', [$this, 'fixFolder'], 10, 4);
+        // Filet de sécurité : si une vérification de WordPress s'est interrompue avant d'interroger GitHub,
+        // l'extension est réinjectée avec la dernière version connue (l'option « mises à jour auto » reste visible).
+        add_filter('site_transient_update_plugins', [$this, 'ensureListed']);
         // « Rechercher les mises à jour » (Tableau de bord › Mises à jour) force une nouvelle vérification.
         add_action('load-update-core.php', [$this, 'clearCacheOnForceCheck']);
     }
@@ -43,9 +48,12 @@ final class GitHubUpdater
             return $update;
         }
         $release = $this->latestRelease();
-        if (!$release) {
-            return $update;
-        }
+        return $release ? $this->updateData($release) : $update;
+    }
+
+    /** Données de mise à jour au format attendu par WordPress. */
+    private function updateData(array $release): array
+    {
         return [
             'id'           => 'https://github.com/' . self::REPO,
             'slug'         => self::SLUG,
@@ -82,7 +90,7 @@ final class GitHubUpdater
             'sections'      => [
                 'description' => '<p>Sauvegardes automatiques et incrémentales (base de données, extensions, thèmes, médias, autres fichiers), stockées uniquement sur le serveur, hors du dossier web, avec restauration automatique. Aucune tâche cron, aucun service distant.</p>'
                     . '<p><a href="https://github.com/' . self::REPO . '" target="_blank" rel="noopener">Documentation complète sur GitHub</a></p>',
-                'changelog'   => $this->toHtml($release['notes']),
+                'changelog'   => $this->toHtml($release['notes'] ?: $this->notes($release['version'])),
             ],
         ];
     }
@@ -115,6 +123,34 @@ final class GitHubUpdater
     }
 
     /**
+     * @param object|false $transient contenu du transitoire « update_plugins »
+     * @return object|false
+     */
+    public function ensureListed($transient)
+    {
+        if (!is_object($transient) || !(is_admin() || wp_doing_cron())) {
+            return $transient;
+        }
+        $file = plugin_basename(BTB_BACKUP_FILE);
+        if (isset($transient->response[$file]) || isset($transient->no_update[$file])) {
+            return $transient;
+        }
+        $release = $this->latestRelease();
+        if (!$release) {
+            return $transient;
+        }
+        $item = (object) ($this->updateData($release) + ['plugin' => $file, 'new_version' => $release['version']]);
+        if (version_compare($release['version'], Config::VERSION, '>')) {
+            $transient->response = (array) ($transient->response ?? []);
+            $transient->response[$file] = $item;
+        } else {
+            $transient->no_update = (array) ($transient->no_update ?? []);
+            $transient->no_update[$file] = $item;
+        }
+        return $transient;
+    }
+
+    /**
      * Dernière release publiée : ['version', 'package', 'url', 'notes', 'date'], ou null.
      */
     public function latestRelease(): ?array
@@ -123,12 +159,14 @@ final class GitHubUpdater
         if (is_array($cached)) {
             return !empty($cached['version']) ? $cached : null;
         }
-        $release = $this->fromApi() ?: $this->fromRedirect();
+        // La redirection de github.com n'est pas soumise au quota de l'API (60 requêtes/heure par adresse IP,
+        // souvent épuisé sur un hébergement mutualisé) : elle passe en premier, l'API ne sert que de secours.
+        $release = $this->fromRedirect() ?: $this->fromApi();
         set_site_transient(self::CACHE_KEY, $release ?: ['version' => null], $release ? self::CACHE_OK : self::CACHE_KO);
         return $release;
     }
 
-    /** API GitHub (avec notes de version et date). */
+    /** API GitHub (avec notes de version et date) : secours, et notes de la fenêtre « Voir les détails ». */
     private function fromApi(): ?array
     {
         $response = wp_remote_get('https://api.github.com/repos/' . self::REPO . '/releases/latest', [
@@ -161,7 +199,20 @@ final class GitHubUpdater
         ];
     }
 
-    /** Secours sans API : la page « latest » redirige vers la page de la release (…/tag/v1.2.3). */
+    /** Notes de la version (API GitHub), mises en cache ; chaîne vide si l'API est indisponible. */
+    private function notes(string $version): string
+    {
+        $cached = get_site_transient(self::NOTES_KEY);
+        if (is_array($cached) && ($cached['version'] ?? '') === $version) {
+            return (string) $cached['notes'];
+        }
+        $api   = $this->fromApi();
+        $notes = ($api && $api['version'] === $version) ? $api['notes'] : '';
+        set_site_transient(self::NOTES_KEY, ['version' => $version, 'notes' => $notes], $notes ? self::NOTES_TTL : self::CACHE_KO);
+        return $notes;
+    }
+
+    /** Sans quota : la page « latest » redirige vers la page de la release (…/tag/v1.2.3). */
     private function fromRedirect(): ?array
     {
         $response = wp_remote_head('https://github.com/' . self::REPO . '/releases/latest', [
