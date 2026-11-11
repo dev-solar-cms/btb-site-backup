@@ -36,7 +36,22 @@ Les sauvegardes restent sur votre serveur, hors du dossier public. L'extension n
 
 La première sauvegarde démarre automatiquement à la visite suivante du site, ou tout de suite avec le bouton **Lancer la sauvegarde**.
 
-Pour mettre à jour, téléversez le ZIP de la nouvelle version : WordPress propose de **remplacer la version installée**. Les sauvegardes et les réglages sont conservés.
+## Mises à jour
+
+Depuis la version 1.0.5, l'extension **se met à jour depuis les releases de ce dépôt**, comme une extension de wordpress.org :
+
+- WordPress affiche « Une nouvelle version de BTB Sauvegarde est disponible » dans **Extensions** et **Tableau de bord › Mises à jour**. Il suffit de cliquer sur **Mettre à jour**.
+- Pour des mises à jour **automatiques**, cliquez sur **Activer les mises à jour automatiques** dans la liste des extensions.
+- Le lien **Voir les détails** affiche les notes de la dernière version.
+
+La dernière release est vérifiée au plus toutes les 6 heures. Le bouton **Rechercher les mises à jour** (Tableau de bord › Mises à jour) force une vérification. Les sauvegardes et les réglages sont conservés.
+
+> **Bedrock** : la colonne « Mises à jour automatiques » n'apparaît que si `AUTOMATIC_UPDATER_DISABLED` vaut `false`. Bedrock la met à `true` par défaut ; ajoutez par exemple dans `config/environments/production.php` :
+> ```php
+> Config::define('AUTOMATIC_UPDATER_DISABLED', false);
+> ```
+
+Pour installer une version à la main, téléversez son ZIP : WordPress propose de **remplacer la version installée**.
 
 ## Où sont stockées les sauvegardes ?
 
@@ -112,6 +127,7 @@ btb-site-backup/
 │   ├── Restore/                 RestoreJob, DatabaseImporter, FileRestorer
 │   ├── Runner/                  Runner, Scheduler, StateHealer
 │   ├── Download/                ZipStreamer
+│   ├── Update/                  GitHubUpdater (mises à jour depuis les releases GitHub)
 │   └── Admin/                   Menu, AdminPage, Progress
 │       ├── Actions/             une classe par action de formulaire (sauvegarder, restaurer, supprimer…)
 │       └── Ajax/                StartAjax, StatusAjax, StepAjax

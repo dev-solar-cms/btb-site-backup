@@ -24,6 +24,7 @@ use BTB\SiteBackup\Support\Logger;
 use BTB\SiteBackup\Support\Paths;
 use BTB\SiteBackup\Support\Settings;
 use BTB\SiteBackup\Support\State;
+use BTB\SiteBackup\Update\GitHubUpdater;
 
 defined('ABSPATH') || exit;
 
@@ -209,6 +210,13 @@ final class Container
     {
         return $this->once('zip', function () {
             return new ZipStreamer($this->objectStore());
+        });
+    }
+
+    public function updater(): GitHubUpdater
+    {
+        return $this->once('updater', function () {
+            return new GitHubUpdater();
         });
     }
 

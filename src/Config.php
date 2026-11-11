@@ -9,7 +9,7 @@ defined('ABSPATH') || exit;
  */
 final class Config
 {
-    const VERSION = '1.0.4';
+    const VERSION = '1.0.5';
 
     // Options WordPress
     const OPT_SETTINGS = 'btb_backup_settings';  // réglages (autoload)

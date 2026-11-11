@@ -2,11 +2,12 @@
 /**
  * Plugin Name: BTB Sauvegarde
  * Description: Sauvegardes automatiques et incrémentales (base de données, extensions, thèmes, médias, autres fichiers), stockées uniquement sur le serveur, hors du dossier web, avec restauration automatique. Aucune tâche cron, aucun service distant.
- * Version: 1.0.4
+ * Version: 1.0.5
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: David ROMERA
  * License: GPL-2.0-or-later
+ * Update URI: https://github.com/dev-solar-cms/btb-site-backup
  * Text Domain: btb-site-backup
  */
 

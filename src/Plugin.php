@@ -68,6 +68,9 @@ final class Plugin
         add_action('wp_ajax_nopriv_btb_backup_step', $step);
         add_action('wp_ajax_btb_backup_step', $step);
 
+        // Mises à jour de l'extension depuis les releases GitHub.
+        $c->updater()->register();
+
         // Déclencheur sans cron : vérifié à la fin de chaque requête.
         add_action('shutdown', [$c->scheduler(), 'onShutdown'], PHP_INT_MAX);
     }
